@@ -1,23 +1,33 @@
 const storage = require('../storage')
 
-const __getComments = postId => storage.posts[postId - 1].comments
-const __getComment = (postId, commentId) => __getComments(postId)[commentId - 1]
+const __getComments = postId => storage.posts[postId - 1] ? storage.posts[postId - 1].comments : null
+const __getComment = (postId, commentId) => {
+    const comments = __getComments(postId)
+    return comments ? comments[commentId - 1] : null
+}
 
 const addComment = (req, res) => {
-    const id = __getComments(req.params.postId).length + 1
-    storage.posts[req.params.postId].comments.push({
+    const comments = __getComments(req.params.postId)
+
+    if (!comments) return res.status(400).send()
+
+    const id = comments.length + 1
+    __getComments(req.params.postId).push({
         id,
-        text: res.body
+        text: req.body.text || ''
     })
 
-    res.status(201).send({...__getComments(req.params.postId)[id - 1]})
+    res.status(201).send({ ...__getComment(req.params.postId, id) })
 }
 
 const updateComment = (req, res) => {
     const comment = __getComment(req.params.postId, req.params.commentId)
-    comment.text = req.body
 
-    res.status(204).send(comment)
+    if (!comment) return res.status(400).send()
+
+    comment.text = req.body.text ||
+
+        res.status(204).send(comment)
 }
 
 const deleteComment = (req, res) => {
