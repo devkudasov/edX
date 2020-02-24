@@ -1,4 +1,5 @@
 const https = require('https');
+const fs = require('fs');
 const converter = require('./converter');
 
 const fetch = (url = 'https://courses.edx.org/assets/courseware/v1/07d100219da1a726dad5eddb090fa215/asset-v1:Microsoft+DEV283x+3T2018+type@asset+block/customer-data.csv') => {
@@ -13,5 +14,5 @@ const fetch = (url = 'https://courses.edx.org/assets/courseware/v1/07d100219da1a
 
 fetch(process.argv[2])
   .then(converter.csvToJson)
-  .then(console.log)
+  .then(json => fs.writeFileSync('csv.json', JSON.stringify(json)))
   .catch(console.error);
